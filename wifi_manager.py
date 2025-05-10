@@ -1,6 +1,5 @@
 import time
 import pywifi
-import psutil
 from pywifi import const
 from rede_wifi import RedeWifi
 
