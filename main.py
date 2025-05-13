@@ -39,6 +39,7 @@ def main():
         icon.stop()
 
     icon.menu = pystray.Menu(pystray.MenuItem("Sair", sair))
+    icon.title = "WiFi Prioritizer"
     icon.icon = icon_image
     icon.run()
 

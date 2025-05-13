@@ -2,6 +2,7 @@ import time
 import pywifi
 from pywifi import const
 from rede_wifi import RedeWifi
+import subprocess
 
 
 class WifiManager:
@@ -10,13 +11,18 @@ class WifiManager:
         self.iface = self.wifi.interfaces()[0]
 
     def escanear_redes(self):
-        self.iface.scan() # procura as redes disponiveis
+        self.iface.scan()
         time.sleep(3)
         return self.iface.scan_results()
     
     def get_rede_conectada(self):
-        if self.iface.status() == const.IFACE_CONNECTED:
-            return self.iface.network_profiles()[0].ssid if self.iface.network_profiles() else None
+        try:
+            resultado = subprocess.check_output(['netsh', 'wlan', 'show', 'interfaces'], encoding='utf-8')
+            for i in resultado.splitlines():
+                if "SSID" in i and "BSSID" not in i:
+                    return i.split(":", 1)[1].strip()
+        except Exception as e:
+            print(f"Erro ao obter rede conectada: {e}")
         return None
 
     def get_nivel_sinal(self, ssid: str, redes):
