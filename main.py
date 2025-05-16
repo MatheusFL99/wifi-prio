@@ -8,6 +8,7 @@ import pystray
 from rede_wifi import RedeWifi
 from wifi_manager import WifiManager
 from wifi_prioritizer import WifiPrioritizer
+from pywifi import const
 
 load_dotenv()
 
@@ -22,10 +23,15 @@ def verificar_redes_continuamente(prioritizer: WifiPrioritizer, intervalo=30):
         time.sleep(intervalo)
 
 def main():
+    wifi_manager = WifiManager()
+
+    while wifi_manager.iface.status() == const.IFACE_DISCONNECTED:
+        print("⏳ Aguardando inicialização da interface Wi-Fi...")
+        time.sleep(5)
+
     rede_a = RedeWifi(os.getenv("REDE_A_SSID"), os.getenv("REDE_A_SENHA"))
     rede_b = RedeWifi(os.getenv("REDE_B_SSID"), os.getenv("REDE_B_SENHA"))
 
-    wifi_manager = WifiManager()
     prioritizer = WifiPrioritizer(rede_a, rede_b, wifi_manager)
 
     t = threading.Thread(target=verificar_redes_continuamente, args=(prioritizer,), daemon=True)
@@ -42,6 +48,7 @@ def main():
     icon.title = "WiFi Prioritizer"
     icon.icon = icon_image
     icon.run()
+
 
 if __name__ == "__main__":
     main()
